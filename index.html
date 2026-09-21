@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bergischland – Monatliches Event</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="bergischland-logo.png" alt="Bergischland City">
+        <div>
+          <strong>BERGISCHLAND</strong>
+          <span>MONATLICHES EVENT</span>
+        </div>
+      </div>
+
+      <nav>
+        <button class="nav-item active" data-tab="overview">⌂ <span>Übersicht</span></button>
+        <button class="nav-item" data-tab="pass">◆ <span>Event Pass</span></button>
+        <button class="nav-item" data-tab="daily">◷ <span>Tägliche Belohnungen</span></button>
+        <button class="nav-item" data-tab="achievements">★ <span>Erfolge</span></button>
+        <button class="nav-item" data-tab="rules">☰ <span>Regeln</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="server-card">
+          <span class="status-dot"></span>
+          <div><b>Bergischland City</b><small>Event läuft</small></div>
+        </div>
+        <div class="keys">ESC <span>Schließen</span></div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">SEPTEMBER / OKTOBER 2026</span>
+          <h1>Monatliches Event</h1>
+          <p>Spiele, sammle Event-Coins und schalte 50 Stufen frei.</p>
+        </div>
+        <div class="wallet">
+          <span>EVENT-COINS</span>
+          <strong id="coinBalance">2.500</strong>
+          <small>Nur erspielbar · kein Echtgeld</small>
+        </div>
+      </header>
+
+      <section id="overview" class="tab-panel active">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <span class="tag">BERGISCHLAND EVENT PASS</span>
+            <h2>50 STUFEN.<br><em>50 CHANCEN.</em></h2>
+            <p>Schalte Event-Stufen mit erspielten Event-Coins frei und sichere dir kosmetische Belohnungen, Titel, Fahrzeugevents und weitere Ingame-Rewards.</p>
+            <button class="primary" data-tab-target="pass">EVENT PASS ÖFFNEN →</button>
+          </div>
+          <div class="hero-art">
+            <div class="ring"></div>
+            <img src="bergischland-logo.png" alt="">
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat"><span>AKTUELLE STUFE</span><b id="overviewLevel">12 / 50</b><div class="progress"><i id="overviewProgress" style="width:24%"></i></div></div>
+          <div class="stat"><span>EVENT-COINS</span><b id="overviewCoins">2.500</b><small>erspielt</small></div>
+          <div class="stat"><span>TÄGLICHE BELOHNUNG</span><b>Tag 7</b><small>Heute abholbar</small></div>
+          <div class="stat"><span>ERFOLGE</span><b>8 / 20</b><small>freigeschaltet</small></div>
+        </div>
+
+        <div class="section-head">
+          <div><span class="eyebrow">SCHNELLZUGRIFF</span><h3>Dein Event</h3></div>
+          <button class="ghost" data-tab-target="daily">Tagesbelohnung ansehen</button>
+        </div>
+
+        <div class="quick-grid">
+          <div class="quick-card"><span class="icon">◆</span><div><b>Event Pass</b><small>Stufe 12 · 38 Stufen offen</small></div><button data-tab-target="pass">Öffnen</button></div>
+          <div class="quick-card"><span class="icon">◷</span><div><b>Tagesbelohnung</b><small>Tag 7 · 150 Event-Coins</small></div><button data-tab-target="daily">Abholen</button></div>
+          <div class="quick-card"><span class="icon">★</span><div><b>Erfolge</b><small>8 von 20 abgeschlossen</small></div><button data-tab-target="achievements">Ansehen</button></div>
+        </div>
+      </section>
+
+      <section id="pass" class="tab-panel">
+        <div class="panel-title">
+          <div><span class="eyebrow">FORTSCHRITT</span><h2>Event Pass</h2></div>
+          <div class="level-pill">STUFE <b id="currentLevel">12</b> / 50</div>
+        </div>
+
+        <div class="pass-summary">
+          <div><span>Freischaltkosten</span><b>steigen pro Stufe</b></div>
+          <div><span>Nächste Stufe</span><b id="nextCost">375 Coins</b></div>
+          <div><span>Event-Ende</span><b>31.10.2026</b></div>
+        </div>
+
+        <div class="pass-track" id="passTrack"></div>
+
+        <div class="legend">
+          <span><i class="dot unlocked"></i> Freigeschaltet</span>
+          <span><i class="dot available"></i> Verfügbar</span>
+          <span><i class="dot locked"></i> Gesperrt</span>
+          <span>Alle Preise = Ingame Event-Coins</span>
+        </div>
+      </section>
+
+      <section id="daily" class="tab-panel">
+        <div class="panel-title"><div><span class="eyebrow">JEDEN TAG</span><h2>Tägliche Belohnungen</h2></div><div class="streak">🔥 7 Tage Streak</div></div>
+        <div class="daily-grid" id="dailyGrid"></div>
+      </section>
+
+      <section id="achievements" class="tab-panel">
+        <div class="panel-title"><div><span class="eyebrow">MISSIONEN</span><h2>Erfolge</h2></div><div class="level-pill">8 / 20</div></div>
+        <div class="achievement-grid" id="achievementGrid"></div>
+      </section>
+
+      <section id="rules" class="tab-panel">
+        <div class="panel-title"><div><span class="eyebrow">FAIR PLAY</span><h2>Event-Regeln</h2></div></div>
+        <div class="rules-card">
+          <h3>Das Event ist komplett Ingame.</h3>
+          <ul>
+            <li>Event-Coins können ausschließlich im Spiel erspielt werden.</li>
+            <li>Es gibt keine Echtgeldkäufe, keine Premium-Währung und keine Zahlungsfunktion.</li>
+            <li>Event-Coins werden für das Freischalten der Pass-Stufen verwendet.</li>
+            <li>Tägliche Belohnungen und Erfolge können zusätzliche Event-Coins geben.</li>
+            <li>Belohnungen sind serverseitig zu prüfen und dürfen nicht über die NUI manipuliert werden.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
