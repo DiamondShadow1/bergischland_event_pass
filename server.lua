@@ -1,7 +1,7 @@
 local resource = GetCurrentResourceName()
 local saveFile = "player_data.json"
 local players = {}
-local defaultState = { coins = 0, level = 1, claimedDays = {}, achievements = {}, dailyDay = 1, dailyClaimed = false, dailyClaimedAt = 0 }
+local defaultState = { coins = 0, level = 1, claimedDays = {}, achievements = {}, dailyDay = 1, dailyClaimed = false, dailyClaimedAt = 0, jobName = nil, jobSeconds = 0, jobLastCheck = 0 }
 local ESX
 
 if Config.Framework == "esx" then
@@ -40,6 +40,41 @@ local function addCoins(source, amount)
     if amount <= 0 then return false end
     local state = getState(source); state.coins = state.coins + amount; saveData(); sync(source); return true
 end
+local function isJobAllowed(jobName)
+    if not jobName or jobName == "unemployed" then return false end
+    if next(Config.JobNames) == nil then return true end
+    return Config.JobNames[jobName] == true
+end
+local function getJobName(source)
+    local player = ESX and ESX.GetPlayerFromId(source)
+    local job = player and player.getJob and player.getJob()
+    return job and job.name or nil
+end
+local function processJobTime(source)
+    if not ESX or not Config.JobRewardItem or Config.JobRewardItem == "" then return end
+    local state = getState(source)
+    local jobName = getJobName(source)
+    local now = os.time()
+    if not isJobAllowed(jobName) then
+        state.jobName, state.jobSeconds, state.jobLastCheck = nil, 0, now
+        return
+    end
+    if state.jobName ~= jobName then
+        state.jobName, state.jobSeconds, state.jobLastCheck = jobName, 0, now
+        saveData()
+        return
+    end
+    local elapsed = math.max(0, math.min(now - (state.jobLastCheck or now), 300))
+    state.jobLastCheck = now
+    state.jobSeconds = (state.jobSeconds or 0) + elapsed
+    local rewards = math.floor(state.jobSeconds / Config.JobRewardInterval)
+    if rewards < 1 then return end
+    local amount = rewards * Config.JobRewardAmount
+    if not giveItem(source, Config.JobRewardItem, amount) then return end
+    state.jobSeconds = state.jobSeconds - (rewards * Config.JobRewardInterval)
+    saveData()
+    TriggerClientEvent("bergischland:event:toast", source, ("+%d %s für deine Jobzeit erhalten."):format(amount, Config.JobRewardItem))
+end
 local function unlockAchievement(source, achievementId)
     achievementId = math.floor(tonumber(achievementId) or 0)
     if achievementId < 1 or achievementId > 8 then return false end
@@ -52,6 +87,12 @@ loadData()
 exports("AddEventCoins", addCoins)
 exports("UnlockEventAchievement", unlockAchievement)
 exports("GetEventState", function(source) return publicState(getState(source)) end)
+CreateThread(function()
+    while true do
+        Wait(60000)
+        for _, playerId in ipairs(GetPlayers()) do processJobTime(tonumber(playerId)) end
+    end
+end)
 RegisterNetEvent("bergischland:event:requestState", function() sync(source) end)
 RegisterNetEvent("bergischland:event:requestAdminOpen", function() if admin(source) then TriggerClientEvent("bergischland:event:openAdmin", source) else TriggerClientEvent("bergischland:event:toast", source, "Keine Berechtigung für den Admin-Befehl.") end end)
 RegisterNetEvent("bergischland:event:unlockLevel", function(level)
