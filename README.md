@@ -1,47 +1,66 @@
 # Bergischland Monthly Event Pass – FiveM Resource
 
-## Enthalten
-- `index.html` – Einstiegspunkt der NUI
-- `style.css` – komplette Oberfläche
-- `script.js` – NUI-Logik und Kommunikation mit Lua
-- `client.lua` – F11, NUI-Fokus und NUI-Callbacks
-- `server.lua` – serverseitige Prüfung und Speicherung
-- `fxmanifest.lua` – FiveM Resource-Manifest
-- `config.lua` – ESX-/ox_inventory-Konfiguration
-- `bergischland-logo.png` – Event-Logo
+Entwickelt von DiamondShadow1.
 
-## Wichtig
-Die Resource speichert Coins, Passstufe, Tagesfortschritt und Erfolge serverseitig in `player_data.json`. Die NUI besitzt keinen lokalen Spielfortschritt und kann Coins oder Stufen nicht selbst setzen.
+## Überblick
+
+Dieses Script ist ein serverseitig validierter Event-Pass für FiveM mit ESX, ox_inventory und oxmysql. Der Client kann keine Belohnungen, Coins, XP, Level oder Rewards selbst vergeben oder freischalten. Alle wichtigen Änderungen werden serverseitig überprüft und in der SQL-Datenbank gespeichert.
+
+## Enthalten
+
+- `index.html` – NUI-Oberfläche
+- `style.css` – Styling und responsives Layout
+- `script.js` – UI-Rendering und NUI-Kommunikation
+- `client.lua` – NUI-Öffnen/Schließen und Client-Requests
+- `server.lua` – serverseitige Logik, Validierung und Persistenz
+- `config.lua` – zentrale Konfiguration
+- `fxmanifest.lua` – Resource-Manifest mit Abhängigkeiten
+- `sql/bergischland_event_pass.sql` – SQL-Schema für `oxmysql`
+- `docs/AUTHOR.md` – Autorendokumentation
+
+## Wichtige Architektur
+
+- Server entscheidet über Event-Coins, Level, Fortschritt und Belohnungen.
+- Die NUI darf keine Entscheidung über Reward-Aktionen treffen.
+- Die Daten werden in einer MySQL-Tabelle gespeichert, nicht in einer lokalen JSON-Datei.
+- `oxmysql` ist als verbindliche Datenbanklösung eingebunden.
 
 ## Installation
 
 1. Den Ordner als `bergischland_event_pass` in den `resources`-Ordner kopieren.
-2. `es_extended` vor dieser Resource starten und in `server.cfg` eintragen: `ensure bergischland_event_pass`.
-3. Admin-Berechtigung setzen, zum Beispiel:
+2. `es_extended`, `ox_inventory` und `oxmysql` entsprechend vorbereiten.
+3. In der `server.cfg` sicherstellen:
+
+```cfg
+ensure es_extended
+ensure oxmysql
+ensure bergischland_event_pass
+```
+
+4. Das SQL-Schema aus `sql/bergischland_event_pass.sql` in die Datenbank importieren.
+5. Optional Admin-Rechte setzen:
 
 ```cfg
 add_ace group.admin bergischland.eventadmin allow
 ```
 
-Normale Spieler öffnen das Event mit `F11`. Admins öffnen es zusätzlich mit `/bergischlandevent`. `ESC` schließt die NUI.
+Normale Spieler öffnen das Event mit `F11`. Admins können das Event zusätzlich mit `/bergischlandevent` öffnen. `ESC` schließt die NUI.
 
-## ESX und ox_inventory
+## ESX, ox_inventory und SQL
 
-Die Resource nutzt ESX für die Gruppenerkennung (`admin` und `superadmin`) und ACE bleibt als zusätzliche Berechtigung aktiv. `ox_inventory` ist optional für Item-Belohnungen. In [config.lua](config.lua) können `Config.DailyRewardItem` und `Config.PassRewardItems` gesetzt werden. Ohne diese Einträge werden nur die eigenen Event-Coins vergeben.
+Die Resource nutzt ESX für die Gruppen- und Job-Erkennung und `ox_inventory` für Item-Belohnungen. `oxmysql` speichert die Event-State-Daten in der Tabelle `bergischland_event_pass`.
 
-Aktive Jobzeit wird automatisch über den aktuellen ESX-Job erkannt. Standardmäßig gibt `Config.JobRewardItem = "event_coins"` nach jeder vollen Stunde `Config.JobRewardAmount = 10` Items über `ox_inventory`. Mit `Config.JobNames = { mechanic = true }` kann die Belohnung auf bestimmte Jobs begrenzt werden; eine leere Tabelle zählt jeden aktiven Job außer `unemployed`. Jobscreator muss den Job über ESX setzen, eine direkte Jobscreator-API ist dafür nicht erforderlich.
+Die wichtigsten Konfigurationen liegen in [config.lua](config.lua):
 
-Der Item-Eintrag in `ox_inventory/data/items.lua` muss zum Beispiel so aussehen:
+- `Config.Framework = "esx"`
+- `Config.Inventory = "ox_inventory"`
+- `Config.DatabaseTable = "bergischland_event_pass"`
+- `Config.MaxPassLevel = 50`
+- `Config.JobRewardItem`, `Config.JobRewardAmount`, `Config.JobRewardInterval`
 
-```lua
-['event_coins'] = {
-	label = 'Event-coins',
-	weight = 1,
-	stack = true,
-},
-```
+Wenn `Config.DailyRewardItem` oder `Config.PassRewardItems` leer sind, werden nur die Event-Coins im Server-Tracking vergeben. Belohnungsitems werden nur serverseitig an Spieler verteilt.
 
-## Anbindung an andere Scripts
+## Server-Exports
 
 Event-Coins können ausschließlich serverseitig vergeben werden:
 
@@ -55,6 +74,15 @@ Erfolge werden ebenfalls serverseitig freigeschaltet:
 exports.bergischland_event_pass:UnlockEventAchievement(source, 1)
 ```
 
-Der Tagesbonus kann nach Ablauf von 24 Stunden abgeholt werden. Spieler werden über ihre `license:`-Identifier erkannt. Für produktive Server mit mehreren Instanzen oder hoher Auslastung sollte `player_data.json` später durch eine SQL-Tabelle, zum Beispiel via oxmysql, ersetzt werden.
+Der Tagesbonus kann nach Ablauf von 24 Stunden abgeholt werden. Spieler werden über ihre `license:`-Identifier erkannt.
 
-Es gibt bewusst keinerlei Echtgeld-, Shop- oder Zahlungsfunktion.
+## Sicherheit und Fair Play
+
+- Keine Client-seitige Reward-Logik
+- Keine Manipulation der NUI als Quellen der Wahrheit
+- Alle Rewards werden serverseitig validiert
+- Keine Echtgeld-, Shop- oder Zahlungsfunktion 
+
+## Autor
+
+Dieses Script wurde entwickelt von DiamondShadow1.

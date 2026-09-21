@@ -20,6 +20,7 @@
       <nav>
         <button class="nav-item active" data-tab="overview">⌂ <span>Übersicht</span></button>
         <button class="nav-item" data-tab="pass">◆ <span>Event Pass</span></button>
+        <button class="nav-item" data-tab="tasks">◫ <span>Aufgaben</span></button>
         <button class="nav-item" data-tab="daily">◷ <span>Tägliche Belohnungen</span></button>
         <button class="nav-item" data-tab="achievements">★ <span>Erfolge</span></button>
         <button class="nav-item" data-tab="rules">☰ <span>Regeln</span></button>
@@ -101,6 +102,30 @@
           <span><i class="dot locked"></i> Gesperrt</span>
           <span>Alle Preise = Ingame Event-Coins</span>
         </div>
+      </section>
+
+      <section id="tasks" class="tab-panel">
+        <div class="panel-title">
+          <div><span class="eyebrow">MISSIONEN</span><h2>Aufgaben</h2></div>
+          <div class="level-pill">AKTIV <b id="taskCounter">0</b></div>
+        </div>
+
+        <div class="task-summary-grid">
+          <div class="summary-card">
+            <span>Abgeschlossen</span>
+            <strong id="taskCompletedCount">0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Verbleibend</span>
+            <strong id="taskOpenCount">0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Belohnung</span>
+            <strong id="taskRewardTotal">0</strong>
+          </div>
+        </div>
+
+        <div class="task-list" id="taskList"></div>
       </section>
 
       <section id="daily" class="tab-panel">
